@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT KPI Evaluation System</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f8fafc;color:#1e293b;font-size:14px}
+:root{
+  --primary:#1a56db;--primary-light:#e8f0fe;--primary-dark:#1240a8;
+  --success:#0e7a4f;--success-light:#d1fae5;
+  --warning:#b45309;--warning-light:#fef3c7;
+  --danger:#b91c1c;--danger-light:#fee2e2;
+  --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
+  --gray-400:#94a3b8;--gray-600:#475569;--gray-800:#1e293b;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,0.08)
+}
+.app{min-height:100vh}
+.header{background:#fff;border-bottom:1px solid var(--gray-200);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-logo{font-size:16px;font-weight:600;color:var(--primary);display:flex;align-items:center;gap:8px}
+.nav-tabs{display:flex;gap:4px;background:var(--gray-100);padding:4px;border-radius:var(--radius);margin:16px 20px 0}
+.tab{padding:8px 16px;border-radius:7px;border:none;background:transparent;cursor:pointer;font-size:13px;font-weight:500;color:var(--gray-600);transition:.15s}
+.tab.active{background:#fff;color:var(--primary);box-shadow:var(--shadow)}
+.content{padding:16px 20px}
+.card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:600;color:var(--gray-800);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-blue{background:var(--primary-light);color:var(--primary)}
+.badge-green{background:var(--success-light);color:var(--success)}
+.badge-amber{background:var(--warning-light);color:var(--warning)}
+.badge-red{background:var(--danger-light);color:var(--danger)}
+.kpi-row{display:grid;grid-template-columns:1fr 70px 90px 70px;gap:8px;align-items:center;padding:8px;border-radius:7px;border:1px solid var(--gray-200);margin-bottom:6px}
+.kpi-name{font-size:13px;color:var(--gray-800)}
+.kpi-sub{font-size:11px;color:var(--gray-400);margin-top:2px}
+.score-input{width:100%;padding:4px 6px;border:1px solid var(--gray-200);border-radius:6px;font-size:13px;text-align:center;background:var(--gray-50)}
+.score-input:focus{outline:none;border-color:var(--primary)}
+.btn{padding:8px 16px;border-radius:7px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-outline{background:#fff;border:1px solid var(--gray-200);color:var(--gray-600)}
+.btn-outline:hover{background:var(--gray-50)}
+.btn-danger{background:var(--danger-light);color:var(--danger);border:none}
+.btn-sm{padding:5px 10px;font-size:12px}
+.row{display:flex;gap:8px;align-items:center}
+.flex-1{flex:1}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.stat-card{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px;text-align:center}
+.stat-num{font-size:22px;font-weight:700;color:var(--primary)}
+.stat-label{font-size:11px;color:var(--gray-400);margin-top:2px}
+.progress-bar{height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:3px;transition:.3s}
+.eng-row{display:grid;grid-template-columns:1fr 65px 65px 65px 65px 85px 36px;gap:6px;align-items:center;padding:8px 10px;border:1px solid var(--gray-200);border-radius:7px;margin-bottom:5px}
+.eng-row:hover{background:var(--gray-50)}
+.eng-name{font-weight:500;font-size:13px}
+.eng-dept{font-size:11px;color:var(--gray-400)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input[type=text],input[type=number],textarea,select{padding:7px 10px;border:1px solid var(--gray-200);border-radius:7px;font-size:13px;width:100%;background:#fff;color:var(--gray-800)}
+input[type=text]:focus,input[type=number]:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)}
+textarea{resize:vertical;min-height:60px}
+label{font-size:12px;color:var(--gray-600);display:block;margin-bottom:4px;font-weight:500}
+.quarter-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.q-tab{padding:5px 14px;border-radius:6px;border:1px solid var(--gray-200);background:#fff;font-size:12px;cursor:pointer;font-weight:500;color:var(--gray-600)}
+.q-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.week-selector{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.w-btn{padding:3px 8px;border-radius:5px;border:1px solid var(--gray-200);background:#fff;font-size:11px;cursor:pointer;color:var(--gray-600)}
+.w-btn.active{background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
+.w-btn.filled{border-color:#86efac;background:#f0fdf4;color:#166534}
+.kpi-section-label{font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;padding:5px 8px;background:var(--primary-light);border-radius:5px;margin:8px 0 4px}
+.rating-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.pill-excellent{background:#d1fae5;color:#065f46}
+.pill-good{background:#dbeafe;color:#1e40af}
+.pill-avg{background:#fef3c7;color:#92400e}
+.pill-poor{background:#fee2e2;color:#991b1b}
+.summary-table{width:100%;border-collapse:collapse;font-size:12px}
+.summary-table th{background:var(--gray-100);padding:7px 10px;text-align:left;border-bottom:1px solid var(--gray-200);font-weight:600;color:var(--gray-600)}
+.summary-table td{padding:7px 10px;border-bottom:1px solid var(--gray-200);vertical-align:middle}
+.summary-table tr:last-child td{border-bottom:none}
+.avatar{border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0}
+.empty-state{text-align:center;padding:32px;color:var(--gray-400)}
+.empty-state .ti{font-size:36px;display:block;margin-bottom:8px}
+.toast{position:fixed;bottom:20px;right:20px;background:#1e293b;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:9999;pointer-events:none;transition:opacity .3s}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:12px;padding:20px;width:90%;max-width:440px}
+@media(max-width:600px){
+  .eng-row{grid-template-columns:1fr 60px 60px 80px 30px}
+  .form-grid{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .kpi-row{grid-template-columns:1fr 55px 70px 55px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useCallback}=React;
+
+const KPIS=[
+  {id:'sla',obj:'Tickets',name:'SLA',weight:6},
+  {id:'quality',obj:'Tickets',name:'Quality',weight:6},
+  {id:'cybersec_course',obj:'Projects & Courses',name:'Cybersecurity & Vulnerability Mgmt Course',weight:2},
+  {id:'sharing_knowledge',obj:'Projects & Courses',name:'Sharing Knowledge',weight:1},
+  {id:'canon_invoice',obj:'Projects & Courses',name:'Canon Invoice Validation & Toners Stock',weight:6},
+  {id:'asset_stock',obj:'Projects & Courses',name:'Asset Stocks Weekly (All Sites)',weight:5},
+  {id:'cycle_time',obj:'Tasks',name:'Cycle Time',weight:6},
+  {id:'accuracy',obj:'Tasks',name:'Accuracy',weight:6},
+  {id:'docs_forms',obj:'Daily Works',name:'Docs, Forms, Visiting',weight:7},
+  {id:'morning_check',obj:'Daily Works',name:'Morning Check',weight:6},
+  {id:'vulnerabilities',obj:'Vulnerabilities',name:'Vulnerabilities',weight:9},
+  {id:'schedule_changes',obj:'Adaptability',name:'Schedule Changes',weight:6},
+  {id:'stress_tolerance',obj:'Adaptability',name:'Stress Tolerance',weight:6},
+  {id:'engagement',obj:'Engagement',name:'Email / Slack / Whatsapp',weight:6},
+  {id:'attendance',obj:'Aligning with Business Goals',name:'Attendance',weight:5},
+  {id:'dress_code',obj:'Aligning with Business Goals',name:'Dress Code',weight:3},
+  {id:'company_policy',obj:'Aligning with Business Goals',name:'Company Policy',weight:5},
+  {id:'team_work',obj:'Aligning with Business Goals',name:'Team Work',weight:5},
+  {id:'customer_satisfaction',obj:'Customer Satisfaction',name:'Customer Satisfaction',weight:4}
+];
+const QUARTERS=['Q1','Q2','Q3','Q4'];
+const WEEKS=Array.from({length:13},(_,i)=>`W${i+1}`);
+const YEAR=new Date().getFullYear();
+
+function getDB(){try{return JSON.parse(localStorage.getItem('it_kpi_v4')||'null')||{engineers:[],evaluations:{}};}catch{return{engineers:[],evaluations:{}};}}
+function saveDB(d){localStorage.setItem('it_kpi_v4',JSON.stringify(d));}
+
+function getRating(s){
+  if(s>=90)return{label:'Excellent',cls:'pill-excellent'};
+  if(s>=75)return{label:'Good',cls:'pill-good'};
+  if(s>=60)return{label:'Average',cls:'pill-avg'};
+  return{label:'Poor',cls:'pill-poor'};
+}
+function getBadge(s){
+  if(s>=90)return'badge-green';
+  if(s>=75)return'badge-blue';
+  if(s>=60)return'badge-amber';
+  return'badge-red';
+}
+function calcWeekScore(ws){
+  let t=0;
+  KPIS.forEach(k=>{t+=(parseFloat(ws[k.id]||0)/10)*k.weight;});
+  return Math.min(t,100);
+}
+function calcQScore(db,engId,q){
+  const key=`${engId}_${YEAR}_${q}`;
+  const ev=db.evaluations[key];
+  if(!ev)return null;
+  const scores=WEEKS.map(w=>ev.weeks&&ev.weeks[w]&&Object.keys(ev.weeks[w]).length>0?calcWeekScore(ev.weeks[w]):null).filter(s=>s!==null);
+  return scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
+}
+function calcAnnual(db,engId){
+  const scores=QUARTERS.map(q=>calcQScore(db,engId,q)).filter(s=>s!==null);
+  return scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
+}
+function initials(name){return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+
+function Toast({msg}){
+  return msg?<div className="toast">{msg}</div>:null;
+}
+
+function App(){
+  const [view,setView]=useState('engineer');
+  const [db,setDb]=useState(getDB);
+  const [toast,setToast]=useState('');
+  const [currentEng,setCurrentEng]=useState(null);
+  const [q,setQ]=useState('Q1');
+  const [w,setW]=useState('W1');
+  const [scores,setScores]=useState({});
+  const [notes,setNotes]=useState('');
+  const [newEng,setNewEng]=useState({name:'',dept:'',role:''});
+  const [showAdd,setShowAdd]=useState(false);
+  const [deleteConfirm,setDeleteConfirm]=useState(null);
+
+  const persist=(d)=>{setDb({...d});saveDB(d);};
+  const showToast=(m)=>{setToast(m);setTimeout(()=>setToast(''),2500);};
+
+  const eng=currentEng?db.engineers.find(e=>e.id===currentEng):null;
+  const evalKey=eng?`${eng.id}_${YEAR}_${q}`:'';
+  const evalData=eng&&db.evaluations[evalKey]||{weeks:{},notes:{},managerComment:''};
+  const weekSaved=evalData.weeks&&evalData.weeks[w]&&Object.keys(evalData.weeks[w]).length>0;
+  const curSaved=weekSaved?evalData.weeks[w]:{};
+
+  useEffect(()=>{
+    if(weekSaved){setScores({...curSaved});setNotes(evalData.notes&&evalData.notes[w]||'');}
+    else{setScores({});setNotes('');}
+  },[currentEng,q,w]);
+
+  const saveWeek=()=>{
+    if(!eng)return;
+    const d={...db};
+    if(!d.evaluations[evalKey])d.evaluations[evalKey]={weeks:{},notes:{},managerComment:''};
+    const s={};KPIS.forEach(k=>{s[k.id]=parseFloat(scores[k.id]||0);});
+    d.evaluations[evalKey].weeks[w]=s;
+    d.evaluations[evalKey].notes=d.evaluations[evalKey].notes||{};
+    d.evaluations[evalKey].notes[w]=notes;
+    persist(d);
+    const sc=calcWeekScore(s);
+    showToast(`✓ Saved ${q}/${w} — Score: ${sc.toFixed(1)}%`);
+  };
+
+  const addEng=()=>{
+    if(!newEng.name.trim()){showToast('Enter engineer name');return;}
+    const d={...db};
+    d.engineers=[...d.engineers,{id:'eng_'+Date.now(),name:newEng.name.trim(),dept:newEng.dept.trim()||'IT',role:newEng.role.trim()||'IT Engineer'}];
+    persist(d);
+    setNewEng({name:'',dept:'',role:''});
+    setShowAdd(false);
+    showToast(`✓ ${newEng.name} added`);
+  };
+
+  const deleteEng=(id)=>{
+    const d={...db};
+    d.engineers=d.engineers.filter(e=>e.id!==id);
+    Object.keys(d.evaluations).forEach(k=>{if(k.startsWith(id))delete d.evaluations[k];});
+    persist(d);
+    if(currentEng===id)setCurrentEng(null);
+    setDeleteConfirm(null);
+    showToast('Engineer removed');
+  };
+
+  const saveMgrComment=(engId,qq,val)=>{
+    const d={...db};
+    const k=`${engId}_${YEAR}_${qq}`;
+    if(!d.evaluations[k])d.evaluations[k]={weeks:{},notes:{},managerComment:''};
+    d.evaluations[k].managerComment=val;
+    persist(d);
+  };
+
+  const weekScore=Object.keys(scores).length>0?calcWeekScore(scores):weekSaved?calcWeekScore(curSaved):null;
+  const qScore=eng?calcQScore(db,eng.id,q):null;
+  const annScore=eng?calcAnnual(db,eng.id):null;
+
+  const grouped={};KPIS.forEach(k=>{if(!grouped[k.obj])grouped[k.obj]=[];grouped[k.obj].push(k);});
+
+  return(
+    <div className="app">
+      <div className="header">
+        <div className="header-logo">
+          <i className="ti ti-chart-bar"/>
+          IT KPI Evaluation System {YEAR}
+        </div>
+        <span className="badge badge-blue">Quarterly</span>
+      </div>
+
+      <div className="nav-tabs">
+        {[['engineer','ti-user','Engineer Portal'],['manager','ti-shield-check','Manager Review'],['annual','ti-calendar-stats','Annual Report']].map(([v,ic,lb])=>(
+          <button key={v} className={`tab${view===v?' active':''}`} onClick={()=>setView(v)}>
+            <i className={`ti ${ic}`}/> {lb}
+          </button>
+        ))}
+      </div>
+
+      <div className="content">
+        {view==='engineer'&&(
+          !currentEng?(
+            <div className="card">
+              <div className="card-title"><i className="ti ti-login"/> Select Your Profile</div>
+              {db.engineers.length===0&&<div className="empty-state"><span className="ti ti-users"/><div>No engineers yet. Ask the manager to add profiles.</div></div>}
+              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(180px,1fr))',gap:8}}>
+                {db.engineers.map(e=>(
+                  <button key={e.id} className="btn btn-outline" onClick={()=>setCurrentEng(e.id)}
+                    style={{padding:12,textAlign:'left',display:'flex',alignItems:'center',gap:10}}>
+                    <div className="avatar" style={{width:38,height:38,fontSize:13}}>{initials(e.name)}</div>
+                    <div><div style={{fontWeight:600,fontSize:13}}>{e.name}</div><div style={{fontSize:11,color:'var(--gray-400)'}}>{e.dept}</div></div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ):(
+            <>
+              <div className="row" style={{marginBottom:12}}>
+                <div className="avatar" style={{width:40,height:40,fontSize:14}}>{initials(eng.name)}</div>
+                <div className="flex-1">
+                  <div style={{fontWeight:600,fontSize:15}}>{eng.name}</div>
+                  <div style={{fontSize:12,color:'var(--gray-400)'}}>{eng.dept} · {eng.role}</div>
+                </div>
+                <button className="btn btn-outline btn-sm" onClick={()=>setCurrentEng(null)}>Change</button>
+              </div>
+
+              <div className="stat-grid">
+                {[[weekScore,'This Week','ti-calendar-week'],[qScore,q+' Average','ti-chart-line'],[annScore,'Annual '+YEAR,'ti-trophy']].map(([sc,lb,ic],i)=>(
+                  <div key={i} className="stat-card">
+                    <div className="stat-num" style={{color:sc>=75?'var(--success)':sc>=60?'var(--primary)':sc!==null?'var(--danger)':'var(--gray-400)'}}>
+                      {sc!==null?sc.toFixed(1)+'%':'—'}
+                    </div>
+                    <div className="stat-label"><i className={`ti ${ic}`}/> {lb}</div>
+                    {sc!==null&&<div className="progress-bar"><div className="progress-fill" style={{width:sc+'%',background:sc>=75?'var(--success)':sc>=60?'var(--primary)':'var(--danger)'}}/></div>}
+                  </div>
+                ))}
+              </div>
+
+              <div className="card">
+                <div className="row" style={{marginBottom:10,flexWrap:'wrap',gap:8}}>
+                  <div className="quarter-tabs" style={{margin:0}}>
+                    {QUARTERS.map(qq=><button key={qq} className={`q-tab${q===qq?' active':''}`} onClick={()=>setQ(qq)}>{qq}</button>)}
+                  </div>
+                </div>
+                <div className="week-selector">
+                  {WEEKS.map(ww=>{
+                    const hasDat=evalData.weeks&&evalData.weeks[ww]&&Object.keys(evalData.weeks[ww]).length>0;
+                    return<button key={ww} className={`w-btn${w===ww?' active':hasDat?' filled':''}`} onClick={()=>setW(ww)}>{ww}{hasDat?'✓':''}</button>;
+                  })}
+                </div>
+
+                <div className="card-title"><i className="ti ti-clipboard-list"/> Weekly KPI Entry — {q} / {w}</div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 70px 90px 70px',gap:8,padding:'6px 8px',background:'var(--gray-100)',borderRadius:6,marginBottom:6,fontSize:11,fontWeight:600,color:'var(--gray-600)'}}>
+                  <span>KPI</span><span style={{textAlign:'center'}}>Weight</span><span style={{textAlign:'center'}}>Score (0–10)</span><span style={{textAlign:'center'}}>%</span>
+                </div>
+
+                {Object.entries(grouped).map(([obj,kpis])=>(
+                  <div key={obj}>
+                    <div className="kpi-section-label">{obj}</div>
+                    {kpis.map(k=>{
+                      const val=scores[k.id]!==undefined?scores[k.id]:'';
+                      const pct=val!==''?(parseFloat(val)*10).toFixed(0):'—';
+                      const col=val>=8?'var(--success)':val>=6?'var(--primary)':val>=4?'var(--warning)':'var(--danger)';
+                      return(
+                        <div key={k.id} className="kpi-row">
+                          <div><div className="kpi-name">{k.name}</div><div className="kpi-sub">Weight: {k.weight}%</div></div>
+                          <div className="kpi-weight">{k.weight}%</div>
+                          <input className="score-input" type="number" min="0" max="10" step="0.1" placeholder="0–10"
+                            value={val} onChange={e=>setScores(p=>({...p,[k.id]:e.target.value}))}/>
+                          <div style={{textAlign:'center',fontWeight:600,fontSize:13,color:val!==''?col:'var(--gray-400)'}}>{pct}{val!==''?'%':''}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+
+                <div style={{marginTop:10}}>
+                  <label>Notes for this week</label>
+                  <textarea placeholder="Any comments or highlights..." value={notes} onChange={e=>setNotes(e.target.value)}/>
+                </div>
+                <div className="row" style={{marginTop:12,justifyContent:'space-between',flexWrap:'wrap',gap:8}}>
+                  <div style={{fontSize:13,color:'var(--gray-600)'}}>
+                    Week score: <strong>{weekScore!==null?weekScore.toFixed(1)+'%':'—'}</strong>
+                    {weekScore!==null&&<span className={`rating-pill ${getRating(weekScore).cls}`} style={{marginLeft:6}}>{getRating(weekScore).label}</span>}
+                  </div>
+                  <button className="btn btn-primary" onClick={saveWeek}><i className="ti ti-device-floppy"/> Save Week</button>
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="card-title"><i className="ti ti-history"/> Quarter Summary — {q}</div>
+                <table className="summary-table">
+                  <thead><tr><th>Week</th><th>Score</th><th>Rating</th><th>Notes</th></tr></thead>
+                  <tbody>
+                    {WEEKS.map(ww=>{
+                      const ws=evalData.weeks&&evalData.weeks[ww];
+                      if(!ws||Object.keys(ws).length===0)return<tr key={ww}><td style={{color:'var(--gray-400)'}}>{ww}</td><td colSpan="3" style={{color:'var(--gray-400)',fontSize:12}}>Not filled</td></tr>;
+                      const sc=calcWeekScore(ws);const rt=getRating(sc);
+                      return<tr key={ww}><td><strong>{ww}</strong></td><td><strong>{sc.toFixed(1)}%</strong></td><td><span className={`rating-pill ${rt.cls}`}>{rt.label}</span></td><td style={{color:'var(--gray-600)',fontSize:12}}>{evalData.notes&&evalData.notes[ww]||'—'}</td></tr>;
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )
+        )}
+
+        {view==='manager'&&(
+          <>
+            <div className="card">
+              <div className="row" style={{justifyContent:'space-between',marginBottom:12}}>
+                <div className="card-title" style={{marginBottom:0}}><i className="ti ti-users"/> Team Management</div>
+                <button className="btn btn-primary btn-sm" onClick={()=>setShowAdd(true)}><i className="ti ti-plus"/> Add Engineer</button>
+              </div>
+              {db.engineers.length===0&&<div className="empty-state"><span className="ti ti-user-plus"/><div>No engineers yet. Add your first team member.</div></div>}
+              {db.engineers.length>0&&(
+                <>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 65px 65px 65px 65px 85px 36px',gap:6,padding:'6px 10px',background:'var(--gray-100)',borderRadius:6,marginBottom:6,fontSize:11,fontWeight:600,color:'var(--gray-600)'}}>
+                    <span>Engineer</span>{QUARTERS.map(q=><span key={q} style={{textAlign:'center'}}>{q}</span>)}<span style={{textAlign:'center'}}>Annual</span><span/>
+                  </div>
+                  {db.engineers.map(e=>{
+                    const qs=QUARTERS.map(qq=>calcQScore(db,e.id,qq));
+                    const ann=calcAnnual(db,e.id);
+                    return(
+                      <div key={e.id} className="eng-row">
+                        <div><div className="eng-name">{e.name}</div><div className="eng-dept">{e.dept} · {e.role}</div></div>
+                        {qs.map((s,i)=><div key={i} style={{textAlign:'center',fontWeight:600,fontSize:12,color:s>=75?'var(--success)':s>=60?'var(--primary)':s!==null?'var(--danger)':'var(--gray-400)'}}>{s!==null?s.toFixed(0)+'%':'—'}</div>)}
+                        <div style={{textAlign:'center'}}>{ann!==null?<strong style={{color:ann>=75?'var(--success)':ann>=60?'var(--primary)':'var(--danger)'}}>{ann.toFixed(1)}%</strong>:<span style={{color:'var(--gray-400)'}}>—</span>}</div>
+                        <button className="btn btn-danger btn-sm" style={{padding:'4px 8px'}} onClick={()=>setDeleteConfirm(e.id)}><i className="ti ti-trash"/></button>
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </div>
+
+            <div className="card">
+              <div className="card-title"><i className="ti ti-message-dots"/> Manager Reviews</div>
+              <div className="quarter-tabs">
+                {QUARTERS.map(qq=><button key={qq} className={`q-tab${q===qq?' active':''}`} onClick={()=>setQ(qq)}>{qq}</button>)}
+              </div>
+              {db.engineers.map(e=>{
+                const k=`${e.id}_${YEAR}_${q}`;
+                const ev=db.evaluations[k];
+                const sc=calcQScore(db,e.id,q);
+                const filled=ev?WEEKS.filter(ww=>ev.weeks&&ev.weeks[ww]&&Object.keys(ev.weeks[ww]).length>0).length:0;
+                return(
+                  <div key={e.id} style={{border:'1px solid var(--gray-200)',borderRadius:8,padding:10,marginBottom:8}}>
+                    <div className="row" style={{marginBottom:8}}>
+                      <div className="avatar" style={{width:36,height:36,fontSize:12}}>{initials(e.name)}</div>
+                      <div className="flex-1"><div style={{fontWeight:600}}>{e.name}</div><div style={{fontSize:11,color:'var(--gray-400)'}}>{filled}/13 weeks filled</div></div>
+                      {sc!==null?<span className={`rating-pill ${getRating(sc).cls}`}>{sc.toFixed(1)}% · {getRating(sc).label}</span>:<span style={{fontSize:12,color:'var(--gray-400)'}}>No data</span>}
+                    </div>
+                    {sc!==null&&<div className="progress-bar" style={{marginBottom:8}}><div className="progress-fill" style={{width:sc+'%',background:sc>=75?'var(--success)':sc>=60?'var(--primary)':'var(--danger)'}}/></div>}
+                    <div>
+                      <label>Manager comment for {q}</label>
+                      <input type="text" placeholder="Add review note..." defaultValue={ev&&ev.managerComment||''} onBlur={e2=>saveMgrComment(e.id,q,e2.target.value)}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {view==='annual'&&(
+          <>
+            <div className="card">
+              <div className="card-title"><i className="ti ti-trophy"/> Annual Report {YEAR}</div>
+              {db.engineers.length===0?<div className="empty-state"><span className="ti ti-chart-bar"/><div>No data yet. Start filling weekly KPIs.</div></div>:(
+                <table className="summary-table">
+                  <thead><tr><th>#</th><th>Engineer</th>{QUARTERS.map(qq=><th key={qq} style={{textAlign:'center'}}>{qq}</th>)}<th style={{textAlign:'center'}}>Annual</th><th>Rating</th></tr></thead>
+                  <tbody>
+                    {[...db.engineers].map(e=>({...e,ann:calcAnnual(db,e.id)})).sort((a,b)=>(b.ann||0)-(a.ann||0)).map((e,i)=>{
+                      const qs=QUARTERS.map(qq=>calcQScore(db,e.id,qq));
+                      const rt=e.ann!==null?getRating(e.ann):{label:'Pending',cls:''};
+                      return(
+                        <tr key={e.id} style={{background:i===0&&e.ann?'var(--success-light)':''}}>
+                          <td style={{fontWeight:700,color:'var(--gray-400)'}}>{i+1}</td>
+                          <td><strong>{e.name}</strong><br/><span style={{fontSize:11,color:'var(--gray-400)'}}>{e.dept}</span></td>
+                          {qs.map((s,j)=><td key={j} style={{textAlign:'center',fontWeight:600,fontSize:12,color:s>=75?'var(--success)':s>=60?'var(--primary)':s!==null?'var(--danger)':'var(--gray-400)'}}>{s!==null?s.toFixed(1)+'%':'—'}</td>)}
+                          <td style={{textAlign:'center',fontSize:16,fontWeight:700,color:e.ann>=75?'var(--success)':e.ann>=60?'var(--primary)':e.ann!==null?'var(--danger)':'var(--gray-400)'}}>{e.ann!==null?e.ann.toFixed(1)+'%':'—'}</td>
+                          <td><span className={`rating-pill ${rt.cls}`}>{rt.label}</span></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
+              {['Excellent','Good','Average','Poor'].map((r,i)=>{
+                const cnt=db.engineers.filter(e=>{const a=calcAnnual(db,e.id);return a!==null&&getRating(a).label===r;}).length;
+                const cls=[' pill-excellent','badge-blue','badge-amber','badge-red'][i];
+                const bg=['var(--success)','var(--primary)','var(--warning)','var(--danger)'][i];
+                return(
+                  <div key={r} className="stat-card">
+                    <div className="stat-num" style={{fontSize:28,color:i===0?'var(--success)':i===1?'var(--primary)':i===2?'var(--warning)':'var(--danger)'}}>{cnt}</div>
+                    <div className="stat-label">{r}</div>
+                    <div className="progress-bar" style={{marginTop:8}}><div className="progress-fill" style={{width:db.engineers.length?cnt/db.engineers.length*100:0+'%',background:bg}}/></div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+
+      {showAdd&&(
+        <div className="modal-bg" onClick={()=>setShowAdd(false)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div style={{fontWeight:600,fontSize:15,marginBottom:14,display:'flex',alignItems:'center',gap:6}}>
+              <i className="ti ti-user-plus"/>Add New Engineer
+            </div>
+            <div style={{marginBottom:10}}><label>Full Name *</label><input type="text" placeholder="Ahmed Mohamed" value={newEng.name} onChange={e=>setNewEng(p=>({...p,name:e.target.value}))}/></div>
+            <div className="form-grid" style={{marginBottom:10}}>
+              <div><label>Department</label><input type="text" placeholder="IT / Cybersecurity" value={newEng.dept} onChange={e=>setNewEng(p=>({...p,dept:e.target.value}))}/></div>
+              <div><label>Role</label><input type="text" placeholder="IT Engineer" value={newEng.role} onChange={e=>setNewEng(p=>({...p,role:e.target.value}))}/></div>
+            </div>
+            <div className="row" style={{justifyContent:'flex-end',gap:8,marginTop:16}}>
+              <button className="btn btn-outline" onClick={()=>setShowAdd(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={addEng}><i className="ti ti-check"/> Add Engineer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirm&&(
+        <div className="modal-bg">
+          <div className="modal">
+            <div style={{fontWeight:600,fontSize:15,marginBottom:10,color:'var(--danger)'}}><i className="ti ti-alert-triangle"/> Confirm Delete</div>
+            <p style={{fontSize:13,color:'var(--gray-600)',marginBottom:16}}>This will permanently delete the engineer and all their evaluation data. This cannot be undone.</p>
+            <div className="row" style={{justifyContent:'flex-end',gap:8}}>
+              <button className="btn btn-outline" onClick={()=>setDeleteConfirm(null)}>Cancel</button>
+              <button className="btn" style={{background:'var(--danger)',color:'#fff'}} onClick={()=>deleteEng(deleteConfirm)}><i className="ti ti-trash"/> Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast&&<div className="toast">{toast}</div>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
